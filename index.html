@@ -41,6 +41,73 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 .complete p{font-size:12px;color:#8f8f88;line-height:1.7}
 .complete button{margin-top:18px}
 .footer{text-align:center;margin-top:28px;font-size:9px;letter-spacing:2px;color:#50514c}
+ 
+/* 생존 지도 팝업 */
+#first-map .complete-box {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.route-map-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 20px auto;
+  cursor: zoom-in;
+  border: 1px solid #625739;
+}
+
+/* 지도 전체 화면 확대 */
+.map-zoom {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0,0,0,.97);
+  flex-direction: column;
+}
+
+.map-zoom.show {
+  display: flex;
+}
+
+.map-zoom-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  color: #d1cec0;
+  flex-shrink: 0;
+}
+
+.map-zoom-area {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  display: flex;
+  align-items: safe center;
+  justify-content: safe center;
+  padding: 12px;
+  touch-action: pan-x pan-y;
+}
+
+.map-zoom-image {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  transform-origin: center center;
+}
+
+.map-zoom-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 15px;
+  flex-shrink: 0;
+}
+
 </style>
 </head>
 <body>
@@ -73,7 +140,30 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 </div>
 <div class="bar"><div class="fill" id="fill"></div></div>
 <div class="small">SUPPLY COLLECTION PROGRESS</div>
+ 
+<!-- 첫 번째 생존 물자 획득 팝업 -->
+<div class="complete" id="first-map">
+  <div class="complete-box">
+    <div class="tiny">ITEM 01 ACQUIRED</div>
+    <h2>ROUTE FILE</h2>
 
+    <img
+      src="route-map.png"
+      alt="생존 경로 지도"
+      style="width:100%;max-height:55vh;object-fit:contain;margin-top:20px;"
+    >
+
+    <p>
+      첫 번째 생존 물자를 확보했습니다.<br>
+      생존 경로 지도를 확인하십시오.
+    </p>
+
+    <button onclick="document.getElementById('first-map').classList.remove('show')">
+      지도 확인 완료
+    </button>
+  </div>
+</div>
+ 
 <div class="complete" id="complete">
 <div class="complete-box">
 <div class="tiny">ALL ITEMS ACQUIRED</div>
@@ -84,6 +174,40 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 </div>
 
 <script>
+ 
+let mapScale = 1;
+
+function openMapZoom() {
+  document.getElementById('map-zoom').classList.add('show');
+  resetMapZoom();
+}
+
+function closeMapZoom() {
+  document.getElementById('map-zoom').classList.remove('show');
+}
+
+function closeFirstMap() {
+  document.getElementById('first-map').classList.remove('show');
+}
+
+function changeMapZoom(amount) {
+  mapScale = Math.max(1, Math.min(4, mapScale + amount));
+
+  const img = document.getElementById('map-zoom-image');
+  img.style.width = (mapScale * 100) + '%';
+  img.style.maxWidth = 'none';
+  img.style.transform = 'none';
+}
+
+function resetMapZoom() {
+  mapScale = 1;
+
+  const img = document.getElementById('map-zoom-image');
+  img.style.width = '100%';
+  img.style.maxWidth = '100%';
+  img.style.transform = 'none';
+}
+
 const ids=['checkpoint','radio','store','supply','exit'];
 let saved=new Set(JSON.parse(localStorage.getItem('bloodcity_stamps')||'[]'));
 
@@ -104,9 +228,27 @@ function resetAll(){
  document.getElementById('complete').classList.remove('show'); render();
 }
 // 실제 QR 테스트: index.html?stamp=radio 같은 주소로 접속하면 자동 적립
-const q=new URLSearchParams(location.search).get('stamp');
-if(ids.includes(q)) saved.add(q);
-render(q && saved.size===ids.length);
+
+const q = new URLSearchParams(location.search).get('stamp');
+
+if (ids.includes(q)) {
+  const isNew = !saved.has(q);
+
+  // QR 스캔 시 도장 적립
+  saved.add(q);
+
+  // 스탬프 화면 업데이트
+  render(isNew && saved.size === ids.length);
+
+  // 첫 번째 QR코드를 스캔하면 지도 팝업 표시
+  if (q === 'checkpoint') {
+    document.getElementById('first-map').classList.add('show');
+  }
+
+} else {
+  render();
+}
+
 </script>
 </body>
 </html>
