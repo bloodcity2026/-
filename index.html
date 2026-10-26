@@ -48,14 +48,26 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   overflow-y: auto;
 }
 
+
 .route-map-image {
   display: block;
   width: 100%;
   height: auto;
-  margin: 20px auto;
-  cursor: zoom-in;
+  aspect-ratio: 1076 / 599;
+  object-fit: contain;
+  margin: 18px auto;
   border: 1px solid #625739;
+  cursor: zoom-in;
 }
+
+#first-map .complete-box {
+  width: 100%;
+  max-width: 440px;
+  max-height: 90dvh;
+  padding: 25px 12px;
+  overflow-y: auto;
+}
+
 
 /* 지도 전체 화면 확대 */
 .map-zoom {
