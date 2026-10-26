@@ -56,7 +56,13 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 <div class="status"><strong>SURVIVAL RECORD</strong><span class="count"><span id="count">0</span> / 5</span></div>
 
 <div class="grid" id="grid">
-<div class="card" data-id="checkpoint"><span class="num">ITEM 01</span><div><div class="name">ROUTE FILE</div><div class="kr">생존 경로 지도</div></div><div class="seal">ACQUIRED<br>01</div></div>
+<div class="card" data-id="checkpoint"><span class="num">ITEM 01</span><div><div class="name">ROUTE FILE</div><div class="kr">생존 경로 지도</div></div><div class="complete-box">
+<div class="tiny">ALL ITEMS ACQUIRED</div>
+<h2>ESCAPE AUTHORIZED</h2>
+<p>모든 생존 물자를 확보했습니다.<br>비상대책본부로 이동하십시오.</p>
+<button onclick="document.getElementById('complete').classList.remove('show')">탈출 승인</button>
+</div>
+</div>
 <div class="card" data-id="radio"><span class="num">ITEM 02</span><div><div class="name">WATER SUPPLY</div><div class="kr">비상 식수</div></div><div class="seal">ACQUIRED<br>02</div></div>
 <div class="card" data-id="store"><span class="num">ITEM 03</span><div><div class="name">FLASHLIGHT</div><div class="kr">휴대용 손전등</div></div><div class="seal">ACQUIRED<br>03</div></div>
 <div class="card" data-id="supply"><span class="num">ITEM 04</span><div><div class="name">CANNED FOOD</div><div class="kr">비상 식량</div></div><div class="seal">ACQUIRED<br>04</div></div>
