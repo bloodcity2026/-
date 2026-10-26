@@ -152,15 +152,17 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 @keyframes locationPulse {
   0% {
     opacity: 1;
-    scale: 0.6;
+    transform: translate(-50%, -50%);
     box-shadow: 0 0 5px #ff3030;
   }
+
   100% {
     opacity: 0;
-    scale: 2;
+    transform: translate(-50%, -150%);
     box-shadow: 0 0 18px #ff3030;
   }
 }
+
 
 .map-zoom-area {
   display: block;
