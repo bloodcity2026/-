@@ -120,6 +120,48 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   flex-shrink: 0;
 }
 
+/* 지도 이미지와 현위치 점멸 효과 */
+.route-map-container {
+  position: relative;
+  width: 100%;
+  margin: 18px auto;
+  cursor: zoom-in;
+}
+
+.route-map-container .route-map-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border: 1px solid #625739;
+}
+
+.location-pulse {
+  position: absolute;
+  left: 48.8%;
+  top: 79%;
+  width: 6%;
+  aspect-ratio: 1;
+  border: 2px solid #ff3030;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  animation: locationPulse 1.6s ease-out infinite;
+}
+
+@keyframes locationPulse {
+  0% {
+    opacity: 1;
+    scale: 0.6;
+    box-shadow: 0 0 5px #ff3030;
+  }
+  100% {
+    opacity: 0;
+    scale: 2;
+    box-shadow: 0 0 18px #ff3030;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -150,11 +192,16 @@ button:hover{border-color:var(--gold);color:var(--gold)}
     <div class="tiny">ITEM 01 ACQUIRED</div>
     <h2>ROUTE FILE</h2>
 
-    <img
-      src="route-map.png"
-      alt="생존 경로 지도"
-      style="width:100%;max-height:55vh;object-fit:contain;margin-top:20px;"
-    >
+   
+<div class="route-map-container" onclick="openMapZoom()">
+  <img
+    src="route-map.png"
+    alt="생존 경로 지도"
+    class="route-map-image"
+  >
+  <span class="location-pulse"></span>
+</div>
+
 
     <p>
       첫 번째 생존 물자를 확보했습니다.<br>
@@ -167,6 +214,34 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   </div>
 </div>
  
+<!-- 지도 확대 화면 -->
+<div class="map-zoom" id="map-zoom">
+
+  <div class="map-zoom-toolbar">
+    <span>생존 경로 지도</span>
+    <button onclick="closeMapZoom()">닫기 ✕</button>
+  </div>
+
+  <div class="map-zoom-area" id="map-zoom-area">
+    <div class="route-map-container" id="zoom-map-container">
+      <img
+        src="route-map.png"
+        alt="확대된 생존 경로 지도"
+        class="route-map-image"
+        id="map-zoom-image"
+      >
+      <span class="location-pulse"></span>
+    </div>
+  </div>
+
+  <div class="map-zoom-controls">
+    <button onclick="changeMapZoom(-0.5)">− 축소</button>
+    <button onclick="resetMapZoom()">원래 크기</button>
+    <button onclick="changeMapZoom(0.5)">+ 확대</button>
+  </div>
+
+</div>
+
 <div class="complete" id="complete">
 <div class="complete-box">
 <div class="tiny">ALL ITEMS ACQUIRED</div>
@@ -178,6 +253,9 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 
 <script>
  
+let mapScale = 1;
+
+
 let mapScale = 1;
 
 function openMapZoom() {
@@ -196,20 +274,19 @@ function closeFirstMap() {
 function changeMapZoom(amount) {
   mapScale = Math.max(1, Math.min(4, mapScale + amount));
 
-  const img = document.getElementById('map-zoom-image');
-  img.style.width = (mapScale * 100) + '%';
-  img.style.maxWidth = 'none';
-  img.style.transform = 'none';
+  const container = document.getElementById('zoom-map-container');
+  container.style.width = (mapScale * 100) + '%';
+  container.style.flexShrink = '0';
 }
 
 function resetMapZoom() {
   mapScale = 1;
 
-  const img = document.getElementById('map-zoom-image');
-  img.style.width = '100%';
-  img.style.maxWidth = '100%';
-  img.style.transform = 'none';
+  const container = document.getElementById('zoom-map-container');
+  container.style.width = '100%';
+  container.style.flexShrink = '0';
 }
+
 
 const ids=['checkpoint','radio','store','supply','exit'];
 let saved=new Set(JSON.parse(localStorage.getItem('bloodcity_stamps')||'[]'));
