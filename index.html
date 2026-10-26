@@ -56,10 +56,13 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 <div class="status"><strong>SURVIVAL RECORD</strong><span class="count"><span id="count">0</span> / 5</span></div>
 
 <div class="grid" id="grid">
-<div class="card" data-id="checkpoint"><span class="num">ITEM 01</span><div><div class="name">ROUTE FILE</div><div class="kr">생존 경로 지도</div></div><div class="complete-box">
+<div class="card" data-id="checkpoint"><span class="num">ITEM 01</span><div><div class="name">ROUTE FILE</div><div class="kr">생존 경로 지도</div></div>
+ <div class="complete" id="complete">
+ <div class="complete-box">
 <div class="tiny">ALL ITEMS ACQUIRED</div>
 <h2>ESCAPE AUTHORIZED</h2>
 <p>모든 생존 물자를 확보했습니다.<br>비상대책본부로 이동하십시오.</p>
+  
 <button onclick="document.getElementById('complete').classList.remove('show')">탈출 승인</button>
 </div>
 </div>
