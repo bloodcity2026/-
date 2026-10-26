@@ -162,6 +162,15 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   }
 }
 
+.map-zoom-area {
+  display: block;
+  overflow: auto;
+}
+
+#zoom-map-container {
+  margin: 0;
+}
+
 </style>
 </head>
 <body>
@@ -255,8 +264,6 @@ button:hover{border-color:var(--gold);color:var(--gold)}
  
 let mapScale = 1;
 
-
-let mapScale = 1;
 
 function openMapZoom() {
   document.getElementById('map-zoom').classList.add('show');
