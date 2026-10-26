@@ -136,6 +136,8 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   border: 1px solid #625739;
 }
 
+
+/* 현위치 핀 점멸 효과 */
 .location-pulse {
   position: absolute;
   left: 49%;
@@ -144,24 +146,27 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   aspect-ratio: 1;
   border: 2px solid #ff3030;
   border-radius: 50%;
-  transform: translate(-50%, -50%);
   pointer-events: none;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
   animation: locationPulse 1.6s ease-out infinite;
 }
 
+/* 제자리에서 원형으로 퍼지는 효과 */
 @keyframes locationPulse {
   0% {
     opacity: 1;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 5px #ff3030;
+    transform: translate(-50%, -50%) scale(0.5);
+    box-shadow: 0 0 4px #ff3030;
   }
 
   100% {
     opacity: 0;
-    transform: translate(-50%, -150%);
-    box-shadow: 0 0 18px #ff3030;
+    transform: translate(-50%, -50%) scale(2.5);
+    box-shadow: 0 0 12px #ff3030;
   }
 }
+
 
 
 .map-zoom-area {
