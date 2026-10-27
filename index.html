@@ -205,12 +205,14 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 }
 
 /* 지도 터치 확대 및 이동 */
+
 .map-zoom-area {
   display: block;
-  overflow: auto;
+  overflow: hidden;
   touch-action: none;
   overscroll-behavior: contain;
 }
+
 
 #zoom-map-container {
   width: 100%;
@@ -464,89 +466,17 @@ function touchDistance(a, b) {
 // 지도 터치 영역
 const mapArea = document.getElementById('map-zoom-area');
 
-// 손가락을 화면에 올렸을 때
+
+// 지도 확대 및 이동 방지
+const mapArea = document.getElementById('map-zoom-area');
+
 mapArea.addEventListener('pointerdown', e => {
-  if (e.pointerType === 'mouse') return;
-
   e.preventDefault();
-  mapArea.setPointerCapture(e.pointerId);
-
-  mapTouches.set(e.pointerId, {
-    clientX: e.clientX,
-    clientY: e.clientY
-  });
-
-  const points = [...mapTouches.values()];
-
-  if (points.length === 2) {
-    lastPinchDistance = touchDistance(points[0], points[1]);
-  } else if (points.length === 1) {
-    lastTouchX = e.clientX;
-    lastTouchY = e.clientY;
-  }
 });
 
-// 손가락을 움직였을 때
-mapArea.addEventListener('pointermove', e => {
-  if (!mapTouches.has(e.pointerId)) return;
-
+mapArea.addEventListener('wheel', e => {
   e.preventDefault();
-
-  mapTouches.set(e.pointerId, {
-    clientX: e.clientX,
-    clientY: e.clientY
-  });
-
-  const points = [...mapTouches.values()];
-
-  // 두 손가락 확대·축소
-  if (points.length === 2) {
-    const distance = touchDistance(points[0], points[1]);
-
-    if (lastPinchDistance > 0) {
-      const rect = mapArea.getBoundingClientRect();
-
-      const centerX =
-        (points[0].clientX + points[1].clientX) / 2;
-
-      const centerY =
-        (points[0].clientY + points[1].clientY) / 2;
-
-      setMapScale(
-        mapScale * distance / lastPinchDistance,
-        centerX - rect.left,
-        centerY - rect.top
-      );
-    }
-
-    lastPinchDistance = distance;
-
-  // 한 손가락으로 지도 이동
-  } else if (points.length === 1) {
-    mapArea.scrollLeft -= e.clientX - lastTouchX;
-    mapArea.scrollTop -= e.clientY - lastTouchY;
-
-    lastTouchX = e.clientX;
-    lastTouchY = e.clientY;
-  }
-});
-
-// 손가락을 뗐을 때
-function endMapTouch(e) {
-  mapTouches.delete(e.pointerId);
-  lastPinchDistance = 0;
-
-  const points = [...mapTouches.values()];
-
-  if (points.length === 1) {
-    lastTouchX = points[0].clientX;
-    lastTouchY = points[0].clientY;
-  }
-}
-
-mapArea.addEventListener('pointerup', endMapTouch);
-mapArea.addEventListener('pointercancel', endMapTouch);
-
+}, { passive: false });
 
 // ==========================
 // 기존 QR 스탬프 기능
