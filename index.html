@@ -730,7 +730,9 @@ function showItemPopup(id) {
     getAcquiredOrder(id);
 
   document.getElementById('item-popup-message').textContent =
-    item.korean + '을(를) 획득했습니다.';
+   
+item.korean + ' 확보가 완료되었습니다.';
+
 
   document.getElementById('item-popup').classList.add('show');
 }
@@ -744,12 +746,14 @@ function closeItemPopup() {
   }
 }
 
-// QR코드 인식
 
-// QR코드 인식
+
+ // QR코드 인식
 const q = new URLSearchParams(location.search).get('stamp');
 
 if (ids.includes(q)) {
+
+  // 새로운 물자인지 확인
   const isNew = !saved.has(q);
 
   if (isNew) {
@@ -762,19 +766,22 @@ if (ids.includes(q)) {
     );
   }
 
-  // 스탬프 화면 업데이트
+  // 스탬프 획득 상태 업데이트
   render(false);
 
-  // 1번 QR: 기존 지도 팝업
+  // 1번: 생존 경로 지도 팝업
   if (q === 'checkpoint') {
+
     document.getElementById('acquired-order').textContent =
       getAcquiredOrder(q);
 
     document.getElementById('first-map').classList.add('show');
 
-  // 2~5번 QR: 물자 획득 팝업
   } else {
+
+    // 2~5번: 각 물자 획득 팝업
     showItemPopup(q);
+
   }
 
 } else {
