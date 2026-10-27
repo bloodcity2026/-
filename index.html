@@ -204,6 +204,31 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   color: #111;
 }
 
+/* 지도 터치 확대 및 이동 */
+.map-zoom-area {
+  display: block;
+  overflow: auto;
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+#zoom-map-container {
+  width: 100%;
+  margin: 0;
+  transform-origin: top left;
+  touch-action: none;
+}
+
+#zoom-map-container img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* 기존 확대·축소 버튼 숨기기 */
+.map-zoom-controls {
+  display: none;
+}
+
 </style>
 </head>
 <body>
@@ -312,72 +337,246 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 
 <script>
  
+
 let mapScale = 1;
+let mapTouches = new Map();
+let lastPinchDistance = 0;
+let lastTouchX = 0;
+let lastTouchY = 0;
 
-
+// 지도 확대 화면 열기
 function openMapZoom() {
   document.getElementById('map-zoom').classList.add('show');
   resetMapZoom();
 }
 
+// 지도 확대 화면 닫기
 function closeMapZoom() {
   document.getElementById('map-zoom').classList.remove('show');
+  mapTouches.clear();
+  lastPinchDistance = 0;
 }
 
+// 첫 번째 지도 팝업 닫기
 function closeFirstMap() {
   document.getElementById('first-map').classList.remove('show');
 }
 
-function changeMapZoom(amount) {
-  mapScale = Math.max(1, Math.min(4, mapScale + amount));
-
+// 지도 확대 비율 변경
+function setMapScale(nextScale, focusX, focusY) {
+  const area = document.getElementById('map-zoom-area');
   const container = document.getElementById('zoom-map-container');
+
+  const oldScale = mapScale;
+  mapScale = Math.max(1, Math.min(4, nextScale));
+
+  if (mapScale === oldScale) return;
+
+  const rect = area.getBoundingClientRect();
+  const x = focusX ?? rect.width / 2;
+  const y = focusY ?? rect.height / 2;
+  const ratio = mapScale / oldScale;
+
+  const oldX = area.scrollLeft + x;
+  const oldY = area.scrollTop + y;
+
   container.style.width = (mapScale * 100) + '%';
   container.style.flexShrink = '0';
+
+  area.scrollLeft = oldX * ratio - x;
+  area.scrollTop = oldY * ratio - y;
 }
 
+// 기존 확대·축소 버튼 기능도 유지
+function changeMapZoom(amount) {
+  setMapScale(mapScale + amount);
+}
+
+// 지도 원래 크기로 초기화
 function resetMapZoom() {
   mapScale = 1;
 
+  const area = document.getElementById('map-zoom-area');
   const container = document.getElementById('zoom-map-container');
+
   container.style.width = '100%';
   container.style.flexShrink = '0';
+
+  area.scrollLeft = 0;
+  area.scrollTop = 0;
+
+  mapTouches.clear();
+  lastPinchDistance = 0;
 }
 
-
-const ids=['checkpoint','radio','store','supply','exit'];
-let saved=new Set(JSON.parse(localStorage.getItem('bloodcity_stamps')||'[]'));
-
-function render(showComplete=false){
- document.querySelectorAll('.card').forEach(c=>c.classList.toggle('done',saved.has(c.dataset.id)));
- document.getElementById('count').textContent=saved.size;
- document.getElementById('fill').style.width=(saved.size/ids.length*100)+'%';
- localStorage.setItem('bloodcity_stamps',JSON.stringify([...saved]));
- if(showComplete && saved.size===ids.length) document.getElementById('complete').classList.add('show');
+// 두 손가락 사이 거리 계산
+function touchDistance(a, b) {
+  return Math.hypot(
+    a.clientX - b.clientX,
+    a.clientY - b.clientY
+  );
 }
-function stamp(id){
- const before=saved.size;
- saved.add(id);
- render(saved.size>before && saved.size===ids.length);
-}
-function resetAll(){
- saved.clear(); localStorage.removeItem('bloodcity_stamps');
- document.getElementById('complete').classList.remove('show'); render();
-}
-// 실제 QR 테스트: index.html?stamp=radio 같은 주소로 접속하면 자동 적립
 
+// 지도 터치 영역
+const mapArea = document.getElementById('map-zoom-area');
+
+// 손가락을 화면에 올렸을 때
+mapArea.addEventListener('pointerdown', e => {
+  if (e.pointerType === 'mouse') return;
+
+  e.preventDefault();
+  mapArea.setPointerCapture(e.pointerId);
+
+  mapTouches.set(e.pointerId, {
+    clientX: e.clientX,
+    clientY: e.clientY
+  });
+
+  const points = [...mapTouches.values()];
+
+  if (points.length === 2) {
+    lastPinchDistance = touchDistance(points[0], points[1]);
+  } else if (points.length === 1) {
+    lastTouchX = e.clientX;
+    lastTouchY = e.clientY;
+  }
+});
+
+// 손가락을 움직였을 때
+mapArea.addEventListener('pointermove', e => {
+  if (!mapTouches.has(e.pointerId)) return;
+
+  e.preventDefault();
+
+  mapTouches.set(e.pointerId, {
+    clientX: e.clientX,
+    clientY: e.clientY
+  });
+
+  const points = [...mapTouches.values()];
+
+  // 두 손가락 확대·축소
+  if (points.length === 2) {
+    const distance = touchDistance(points[0], points[1]);
+
+    if (lastPinchDistance > 0) {
+      const rect = mapArea.getBoundingClientRect();
+
+      const centerX =
+        (points[0].clientX + points[1].clientX) / 2;
+
+      const centerY =
+        (points[0].clientY + points[1].clientY) / 2;
+
+      setMapScale(
+        mapScale * distance / lastPinchDistance,
+        centerX - rect.left,
+        centerY - rect.top
+      );
+    }
+
+    lastPinchDistance = distance;
+
+  // 한 손가락으로 지도 이동
+  } else if (points.length === 1) {
+    mapArea.scrollLeft -= e.clientX - lastTouchX;
+    mapArea.scrollTop -= e.clientY - lastTouchY;
+
+    lastTouchX = e.clientX;
+    lastTouchY = e.clientY;
+  }
+});
+
+// 손가락을 뗐을 때
+function endMapTouch(e) {
+  mapTouches.delete(e.pointerId);
+  lastPinchDistance = 0;
+
+  const points = [...mapTouches.values()];
+
+  if (points.length === 1) {
+    lastTouchX = points[0].clientX;
+    lastTouchY = points[0].clientY;
+  }
+}
+
+mapArea.addEventListener('pointerup', endMapTouch);
+mapArea.addEventListener('pointercancel', endMapTouch);
+
+
+// ==========================
+// 기존 QR 스탬프 기능
+// ==========================
+
+const ids = [
+  'checkpoint',
+  'radio',
+  'store',
+  'supply',
+  'exit'
+];
+
+let saved = new Set(
+  JSON.parse(
+    localStorage.getItem('bloodcity_stamps') || '[]'
+  )
+);
+
+// 스탬프 화면 업데이트
+function render(showComplete = false) {
+  document.querySelectorAll('.card').forEach(c =>
+    c.classList.toggle('done', saved.has(c.dataset.id))
+  );
+
+  document.getElementById('count').textContent = saved.size;
+
+  document.getElementById('fill').style.width =
+    (saved.size / ids.length * 100) + '%';
+
+  localStorage.setItem(
+    'bloodcity_stamps',
+    JSON.stringify([...saved])
+  );
+
+  if (showComplete && saved.size === ids.length) {
+    document.getElementById('complete').classList.add('show');
+  }
+}
+
+// 도장 적립
+function stamp(id) {
+  const before = saved.size;
+
+  saved.add(id);
+
+  render(
+    saved.size > before &&
+    saved.size === ids.length
+  );
+}
+
+// 도장 초기화
+function resetAll() {
+  saved.clear();
+
+  localStorage.removeItem('bloodcity_stamps');
+
+  document.getElementById('complete').classList.remove('show');
+
+  render();
+}
+
+// QR코드 인식
 const q = new URLSearchParams(location.search).get('stamp');
 
 if (ids.includes(q)) {
   const isNew = !saved.has(q);
 
-  // QR 스캔 시 도장 적립
   saved.add(q);
 
-  // 스탬프 화면 업데이트
   render(isNew && saved.size === ids.length);
 
-  // 첫 번째 QR코드를 스캔하면 지도 팝업 표시
+  // 첫 번째 QR코드 지도 팝업
   if (q === 'checkpoint') {
     document.getElementById('first-map').classList.add('show');
   }
