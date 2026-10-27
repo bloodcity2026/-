@@ -300,6 +300,17 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 
 
  
+/* 획득하지 않은 물자의 점멸 원 숨기기 */
+#zoom-map-container .location-pulse {
+  display: none;
+  width: 4%;
+}
+
+/* 획득한 물자의 점멸 원만 표시 */
+#zoom-map-container .location-pulse.acquired {
+  display: block;
+}
+
 </style>
 </head>
 <body>
@@ -394,7 +405,18 @@ button:hover{border-color:var(--gold);color:var(--gold)}
         class="route-map-image"
         id="map-zoom-image"
       >
-      <span class="location-pulse"></span>
+     
+<!-- 획득한 생존 물자 위치 점멸 -->
+<span class="location-pulse" data-stamp="checkpoint" style="left:48.9%;top:79.2%;"></span>
+
+<span class="location-pulse" data-stamp="radio" style="left:74.9%;top:79.2%;"></span>
+
+<span class="location-pulse" data-stamp="store" style="left:84.5%;top:38.4%;"></span>
+
+<span class="location-pulse" data-stamp="supply" style="left:14.9%;top:62.4%;"></span>
+
+<span class="location-pulse" data-stamp="exit" style="left:14.9%;top:31.3%;"></span>
+
     </div>
   </div>
 
@@ -425,10 +447,26 @@ let lastTouchX = 0;
 let lastTouchY = 0;
 
 // 지도 확대 화면 열기
+
+// 획득한 물자에 해당하는 핀 점멸 표시
+function updateMapPulses() {
+  document.querySelectorAll(
+    '#zoom-map-container .location-pulse'
+  ).forEach(pulse => {
+    pulse.classList.toggle(
+      'acquired',
+      saved.has(pulse.dataset.stamp)
+    );
+  });
+}
+
+// 지도 다시 보기 열기
 function openMapZoom() {
+  updateMapPulses();
   document.getElementById('map-zoom').classList.add('show');
   resetMapZoom();
 }
+
 
 // 지도 확대 화면 닫기
 function closeMapZoom() {
