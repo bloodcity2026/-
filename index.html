@@ -378,14 +378,21 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 </div>
 
 
-    <p>
-      첫 번째 생존 물자를 확보했습니다.<br>
-      생존 경로 지도를 확인하십시오.
-    </p>
+  
+<p>
+  <span id="acquired-order">첫 번째</span> 생존 물자를 확보했습니다.<br>
+  생존 경로 지도를 확인하십시오.
+</p>
 
-    <button onclick="document.getElementById('first-map').classList.remove('show')">
-      지도 확인 완료
-    </button>
+
+   <button onclick="
+  document.getElementById('first-map').classList.remove('show');
+  if (saved.size === ids.length) {
+    document.getElementById('complete').classList.add('show');
+  }
+">
+  지도 확인 완료
+</button>
   </div>
 </div>
  
@@ -426,6 +433,34 @@ button:hover{border-color:var(--gold);color:var(--gold)}
     <button onclick="changeMapZoom(0.5)">+ 확대</button>
   </div>
 
+</div>
+
+<!-- 2~5번 생존 물자 획득 팝업 -->
+<div class="complete" id="item-popup">
+  <div class="complete-box">
+
+    <div class="tiny" id="item-popup-number">
+      ITEM ACQUIRED
+    </div>
+
+    <h2 id="item-popup-title">SUPPLY ACQUIRED</h2>
+
+    <p id="item-popup-korean"></p>
+
+    <!-- 추후 물자 사진 추가 위치 -->
+
+    <p>
+      <span id="item-popup-order">첫 번째</span>
+      생존 물자를 확보했습니다.
+    </p>
+
+    <p id="item-popup-message"></p>
+
+    <button onclick="closeItemPopup()">
+      물자 확인 완료
+    </button>
+
+  </div>
 </div>
 
 <div class="complete" id="complete">
@@ -599,16 +634,117 @@ function stamp(id) {
   );
 }
 
-// 도장 초기화
+
 function resetAll() {
   saved.clear();
+  acquiredHistory = [];
 
   localStorage.removeItem('bloodcity_stamps');
+  localStorage.removeItem('bloodcity_acquired_order');
 
   document.getElementById('complete').classList.remove('show');
+  document.getElementById('first-map').classList.remove('show');
+  document.getElementById('item-popup').classList.remove('show');
 
   render();
 }
+
+
+// 생존 물자별 정보
+const itemInfo = {
+  checkpoint: {
+    number: '01',
+    title: 'ROUTE FILE',
+    korean: '생존 경로 지도'
+  },
+  radio: {
+    number: '02',
+    title: 'WATER SUPPLY',
+    korean: '비상 식수'
+  },
+  store: {
+    number: '03',
+    title: 'FLASHLIGHT',
+    korean: '휴대용 손전등'
+  },
+  supply: {
+    number: '04',
+    title: 'CANNED FOOD',
+    korean: '비상 식량'
+  },
+  exit: {
+    number: '05',
+    title: 'LIGHTER',
+    korean: '휴대용 점화 도구'
+  }
+};
+
+// 획득 순서 기록
+const orderKey = 'bloodcity_acquired_order';
+
+let acquiredHistory = JSON.parse(
+  localStorage.getItem(orderKey) || '[]'
+);
+
+// 기존 적립 기록과 순서 기록 동기화
+acquiredHistory = acquiredHistory.filter(id => saved.has(id));
+
+saved.forEach(id => {
+  if (!acquiredHistory.includes(id)) {
+    acquiredHistory.push(id);
+  }
+});
+
+localStorage.setItem(
+  orderKey,
+  JSON.stringify(acquiredHistory)
+);
+
+// 획득 순서 한글 변환
+const orderNames = [
+  '첫 번째',
+  '두 번째',
+  '세 번째',
+  '네 번째',
+  '다섯 번째'
+];
+
+function getAcquiredOrder(id) {
+  return orderNames[acquiredHistory.indexOf(id)] || '첫 번째';
+}
+
+// 2~5번 획득 팝업 열기
+function showItemPopup(id) {
+  const item = itemInfo[id];
+
+  document.getElementById('item-popup-number').textContent =
+    'ITEM ' + item.number + ' ACQUIRED';
+
+  document.getElementById('item-popup-title').textContent =
+    item.title;
+
+  document.getElementById('item-popup-korean').textContent =
+    item.korean;
+
+  document.getElementById('item-popup-order').textContent =
+    getAcquiredOrder(id);
+
+  document.getElementById('item-popup-message').textContent =
+    item.korean + '을(를) 획득했습니다.';
+
+  document.getElementById('item-popup').classList.add('show');
+}
+
+// 획득 팝업 닫기
+function closeItemPopup() {
+  document.getElementById('item-popup').classList.remove('show');
+
+  if (saved.size === ids.length) {
+    document.getElementById('complete').classList.add('show');
+  }
+}
+
+// QR코드 인식
 
 // QR코드 인식
 const q = new URLSearchParams(location.search).get('stamp');
@@ -616,14 +752,35 @@ const q = new URLSearchParams(location.search).get('stamp');
 if (ids.includes(q)) {
   const isNew = !saved.has(q);
 
-  saved.add(q);
+  if (isNew) {
+    saved.add(q);
+    acquiredHistory.push(q);
 
-  render(isNew && saved.size === ids.length);
-
-  // 첫 번째 QR코드 지도 팝업
-  if (q === 'checkpoint') {
-    document.getElementById('first-map').classList.add('show');
+    localStorage.setItem(
+      orderKey,
+      JSON.stringify(acquiredHistory)
+    );
   }
+
+  // 스탬프 화면 업데이트
+  render(false);
+
+  // 1번 QR: 기존 지도 팝업
+  if (q === 'checkpoint') {
+    document.getElementById('acquired-order').textContent =
+      getAcquiredOrder(q);
+
+    document.getElementById('first-map').classList.add('show');
+
+  // 2~5번 QR: 물자 획득 팝업
+  } else {
+    showItemPopup(q);
+  }
+
+} else {
+  render();
+}
+
 
 } else {
   render();
