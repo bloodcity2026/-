@@ -463,12 +463,10 @@ function touchDistance(a, b) {
   );
 }
 
-// 지도 터치 영역
+
+ // 지도 확대 및 이동 방지
 const mapArea = document.getElementById('map-zoom-area');
 
-
-// 지도 확대 및 이동 방지
-const mapArea = document.getElementById('map-zoom-area');
 
 mapArea.addEventListener('pointerdown', e => {
   e.preventDefault();
