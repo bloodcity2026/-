@@ -277,6 +277,29 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 }
 
 
+ 
+/* 테스트용 초기화 버튼 */
+.reset-area {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.reset-test-btn {
+  padding: 10px 18px;
+  border: 1px solid #7d3838;
+  background: #1c1212;
+  color: #c77777;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.reset-test-btn:hover {
+  background: #632727;
+  color: #fff;
+}
+
+
+ 
 </style>
 </head>
 <body>
@@ -317,6 +340,15 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 </div>
 <div class="bar"><div class="fill" id="fill"></div></div>
 <div class="small">SUPPLY COLLECTION PROGRESS</div>
+
+ 
+<!-- 테스트용 생존 물자 초기화 버튼 -->
+<div class="reset-area">
+  <button class="reset-test-btn" onclick="resetAll()">
+    생존 물자 초기화 (테스트용)
+  </button>
+</div>
+
  
 <!-- 첫 번째 생존 물자 획득 팝업 -->
 <div class="complete" id="first-map">
