@@ -178,6 +178,32 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   margin: 0;
 }
 
+/* 생존 지도 다시 보기 버튼 */
+.map-reopen-btn {
+  display: none;
+  position: relative;
+  z-index: 2;
+  align-self: flex-start;
+  margin-top: 12px;
+  padding: 7px 12px;
+  border: 1px solid #b79a4e;
+  background: #1b1b17;
+  color: #c8b77f;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+/* 첫 번째 물자 획득 후 버튼 표시 */
+.card.done .map-reopen-btn {
+  display: block;
+}
+
+.map-reopen-btn:hover {
+  background: #b79a4e;
+  color: #111;
+}
+
 </style>
 </head>
 <body>
@@ -193,7 +219,24 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 <div class="status"><strong>SURVIVAL RECORD</strong><span class="count"><span id="count">0</span> / 5</span></div>
 
 <div class="grid" id="grid">
-<div class="card" data-id="checkpoint"><span class="num">ITEM 01</span><div><div class="name">ROUTE FILE</div><div class="kr">생존 경로 지도</div></div><div class="seal">ACQUIRED<br>01</div></div>
+<div class="card" data-id="checkpoint">
+  <span class="num">ITEM 01</span>
+
+  <div>
+    <div class="name">ROUTE FILE</div>
+    <div class="kr">생존 경로 지도</div>
+  </div>
+
+  <div class="seal">ACQUIRED<br>01</div>
+
+  <button
+    class="map-reopen-btn"
+    onclick="openMapZoom()"
+  >
+    지도 다시 보기
+  </button>
+</div>
+
 <div class="card" data-id="radio"><span class="num">ITEM 02</span><div><div class="name">WATER SUPPLY</div><div class="kr">비상 식수</div></div><div class="seal">ACQUIRED<br>02</div></div>
 <div class="card" data-id="store"><span class="num">ITEM 03</span><div><div class="name">FLASHLIGHT</div><div class="kr">휴대용 손전등</div></div><div class="seal">ACQUIRED<br>03</div></div>
 <div class="card" data-id="supply"><span class="num">ITEM 04</span><div><div class="name">CANNED FOOD</div><div class="kr">비상 식량</div></div><div class="seal">ACQUIRED<br>04</div></div>
