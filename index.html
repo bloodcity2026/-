@@ -229,28 +229,44 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   display: none;
 }
 
+
 /* 확대 지도와 점멸 효과 위치 고정 */
 #zoom-map-container {
   position: relative;
   width: 100%;
   margin: 0;
   flex-shrink: 0;
-  aspect-ratio: 1076 / 599;
+  height: auto;
+  aspect-ratio: auto;
   transform-origin: top left;
 }
 
+
+
+/* 확대 지도 이미지 */
 #zoom-map-container .route-map-image {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1076 / 599;
+  aspect-ratio: auto;
+  object-fit: fill;
   margin: 0;
 }
 
 /* 확대 지도에서만 점멸 위치 지정 */
 #zoom-map-container .location-pulse {
-  left: 49%;
-  top: 79%;
+  left: 49.1%;
+  top: 80.1%;
+  width: 6%;
+  transform-origin: center center;
+  pointer-events: none;
+}
+
+
+/* 확대 지도에서만 점멸 위치 지정 */
+#zoom-map-container .location-pulse {
+  left: 49.1%;
+  top: 80.1%;
   width: 6%;
   transform: translate(-50%, -50%);
   transform-origin: center center;
