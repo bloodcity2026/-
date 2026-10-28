@@ -350,6 +350,68 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   }
 }
 
+/* 지도와 획득 물자 목록 세로 배치 */
+#map-zoom-area {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow-y: auto;
+  overflow-x: hidden;
+  touch-action: pan-y;
+}
+
+/* 획득 물자 목록 */
+.acquired-supplies {
+  width: 100%;
+  flex-shrink: 0;
+  margin-top: 20px;
+  padding: 16px 8px 30px;
+  border-top: 1px solid #625739;
+}
+
+.acquired-supplies-title {
+  color: #b79a4e;
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 15px;
+}
+
+.acquired-supplies-title span {
+  display: block;
+  color: #99978d;
+  font-size: 11px;
+  letter-spacing: 0;
+  margin-top: 6px;
+}
+
+.acquired-supplies-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.acquired-supply-card {
+  min-width: 0;
+  padding: 8px;
+  background: #151716;
+  border: 1px solid #625739;
+  text-align: center;
+}
+
+.acquired-supply-card img {
+  display: block;
+  width: 100%;
+  height: 110px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+
+.acquired-supply-card span {
+  color: #d1cec0;
+  font-size: 11px;
+}
+
 </style>
 </head>
 <body>
@@ -468,6 +530,17 @@ button:hover{border-color:var(--gold);color:var(--gold)}
     </div>
   </div>
 
+<!-- 획득한 생존 물자 목록 -->
+<div class="acquired-supplies">
+  <div class="acquired-supplies-title">
+    ACQUIRED SUPPLIES
+    <span>확보한 생존 물자</span>
+  </div>
+
+  <div class="acquired-supplies-grid" id="acquired-supplies-grid">
+  </div>
+</div>
+
   <div class="map-zoom-controls">
     <button onclick="changeMapZoom(-0.5)">− 축소</button>
     <button onclick="resetMapZoom()">원래 크기</button>
@@ -544,11 +617,50 @@ function updateMapPulses() {
 }
 
 // 지도 다시 보기 열기
+
+function updateAcquiredSupplies() {
+  const grid = document.getElementById('acquired-supplies-grid');
+
+  grid.innerHTML = '';
+
+  const supplies = [
+    { id: 'radio', name: '비상 식수', image: 'water.png' },
+    { id: 'store', name: '휴대용 손전등', image: 'flashlight.png' },
+    { id: 'supply', name: '비상 식량', image: 'food.png' },
+    { id: 'exit', name: '휴대용 점화 도구', image: 'lighter.png' }
+  ];
+
+  supplies.forEach(item => {
+    if (!saved.has(item.id)) return;
+
+    const card = document.createElement('div');
+    card.className = 'acquired-supply-card';
+
+    const img = document.createElement('img');
+    img.src = item.image;
+    img.alt = item.name;
+
+    const name = document.createElement('span');
+    name.textContent = item.name;
+
+    card.appendChild(img);
+    card.appendChild(name);
+    grid.appendChild(card);
+  });
+
+  if (!grid.children.length) {
+    grid.textContent = '아직 확보한 추가 생존 물자가 없습니다.';
+  }
+}
+
 function openMapZoom() {
   updateMapPulses();
+  updateAcquiredSupplies();
+
   document.getElementById('map-zoom').classList.add('show');
   resetMapZoom();
 }
+
 
 
 // 지도 확대 화면 닫기
@@ -623,9 +735,6 @@ function touchDistance(a, b) {
 const mapArea = document.getElementById('map-zoom-area');
 
 
-mapArea.addEventListener('pointerdown', e => {
-  e.preventDefault();
-});
 
 mapArea.addEventListener('wheel', e => {
   e.preventDefault();
