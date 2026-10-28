@@ -429,6 +429,67 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   white-space: nowrap;
 }
 
+/* 2~5번 QR 개별 현위치 지도 */
+.item-location-map {
+  display: none;
+  width: 100%;
+  margin: 20px auto;
+}
+
+.item-location-title {
+  color: #b79a4e;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.item-location-title span {
+  display: block;
+  margin-top: 6px;
+  color: #c7c5bb;
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.item-location-map-image {
+  position: relative;
+  width: 100%;
+  border: 1px solid #625739;
+}
+
+.item-location-map-image img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* 붉은색 현위치 점멸 */
+#item-location-pulse {
+  position: absolute;
+  width: 5%;
+  aspect-ratio: 1;
+  border: 2px solid #ff3030;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 8px #ff3030;
+  animation: itemLocationBlink 1.6s ease-out infinite;
+}
+
+@keyframes itemLocationBlink {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5);
+    box-shadow: 0 0 4px #ff3030;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.5);
+    box-shadow: 0 0 12px #ff3030;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -514,49 +575,47 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   </div>
 </div>
  
+
 <!-- 지도 확대 화면 -->
 <div class="map-zoom" id="map-zoom">
 
- 
-<div class="map-zoom-toolbar">
-  <span>생존 물자 확보 현황</span>
-  <button onclick="closeMapZoom()">닫기 ✕</button>
-</div>
-
+  <div class="map-zoom-toolbar">
+    <span>생존 물자 확보 현황</span>
+    <button onclick="closeMapZoom()">닫기 ✕</button>
+  </div>
 
   <div class="map-zoom-area" id="map-zoom-area">
+
     <div class="route-map-container" id="zoom-map-container">
       <img
         src="route-map-review.png"
-        alt="확대된 생존 경로 지도"
+        alt="생존 물자 확보 현황 지도"
         class="route-map-image"
         id="map-zoom-image"
       >
-     
-<!-- 획득한 생존 물자 위치 점멸 -->
-<span class="location-pulse" data-stamp="checkpoint" style="left:48.9%;top:79.2%;"></span>
 
-<span class="location-pulse" data-stamp="radio" style="left:74.9%;top:79.2%;"></span>
-
-<span class="location-pulse" data-stamp="store" style="left:84.5%;top:38.4%;"></span>
-
-<span class="location-pulse" data-stamp="supply" style="left:14.9%;top:62.4%;"></span>
-
-<span class="location-pulse" data-stamp="exit" style="left:14.9%;top:31.3%;"></span>
-
+      <!-- 획득한 생존 물자 위치 점멸 -->
+      <span class="location-pulse" data-stamp="checkpoint" style="left:48.9%;top:79.2%;"></span>
+      <span class="location-pulse" data-stamp="radio" style="left:74.9%;top:79.2%;"></span>
+      <span class="location-pulse" data-stamp="store" style="left:84.5%;top:38.4%;"></span>
+      <span class="location-pulse" data-stamp="supply" style="left:14.9%;top:62.4%;"></span>
+      <span class="location-pulse" data-stamp="exit" style="left:14.9%;top:31.3%;"></span>
     </div>
-  </div>
 
-<!-- 획득한 생존 물자 목록 -->
-<div class="acquired-supplies">
-  <div class="acquired-supplies-title">
-    ACQUIRED SUPPLIES
-    <span>확보한 생존 물자</span>
-  </div>
+    <!-- 획득한 생존 물자 목록 -->
+    <div class="acquired-supplies">
+      <div class="acquired-supplies-title">
+        ACQUIRED SUPPLIES
+        <span>확보한 생존 물자</span>
+      </div>
 
-  <div class="acquired-supplies-grid" id="acquired-supplies-grid">
+      <div
+        class="acquired-supplies-grid"
+        id="acquired-supplies-grid">
+      </div>
+    </div>
+
   </div>
-</div>
 
   <div class="map-zoom-controls">
     <button onclick="changeMapZoom(-0.5)">− 축소</button>
@@ -565,6 +624,7 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   </div>
 
 </div>
+
 
 <!-- 생존 물자 중복 획득 안내 -->
 <div class="complete" id="duplicate-popup">
@@ -605,6 +665,26 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   src=""
   alt="생존 물자 이미지"
 >
+
+<!-- 2~5번 QR 현위치 안내 지도 -->
+<div id="item-location-map" class="item-location-map">
+
+  <div class="item-location-title">
+    LOCATION INFORMATION
+    <span>현위치 안내 지도</span>
+  </div>
+
+  <div class="item-location-map-image">
+    <img
+      id="item-location-image"
+      src=""
+      alt="현위치 안내 지도"
+    >
+
+    <span id="item-location-pulse"></span>
+  </div>
+
+</div>
 
     <p>
       <span id="item-popup-order">첫 번째</span>
@@ -771,11 +851,6 @@ function touchDistance(a, b) {
 const mapArea = document.getElementById('map-zoom-area');
 
 
-
-mapArea.addEventListener('wheel', e => {
-  e.preventDefault();
-}, { passive: false });
-
 // ==========================
 // 기존 QR 스탬프 기능
 // ==========================
@@ -838,6 +913,7 @@ function resetAll() {
   document.getElementById('complete').classList.remove('show');
   document.getElementById('first-map').classList.remove('show');
   document.getElementById('item-popup').classList.remove('show');
+ document.getElementById('duplicate-popup').classList.remove('show');
 
   render();
 }
@@ -930,6 +1006,64 @@ function closeDuplicatePopup() {
   document.getElementById('duplicate-popup').classList.remove('show');
 }
 
+/* 2~5번 QR별 지도 이미지와 현위치 */
+
+/* 2~5번 QR별 지도 이미지와 현위치 좌표 */
+const itemLocations = {
+  // 2번 QR - 비상 식수 (비상대책본부)
+  radio: {
+    image: 'map-water.png',
+    left: '74.9%',
+    top: '79.2%'
+  },
+
+  // 3번 QR - 휴대용 손전등 (통신소)
+  store: {
+    image: 'map-flashlight.png',
+    left: '84.5%',
+    top: '38.4%'
+  },
+
+  // 4번 QR - 비상 식량 (주점)
+  supply: {
+    image: 'map-food.png',
+    left: '14.9%',
+    top: '62.4%'
+  },
+
+  // 5번 QR - 휴대용 점화 도구 (푸드트럭)
+  exit: {
+    image: 'map-lighter.png',
+    left: '14.9%',
+    top: '31.3%'
+  }
+};
+
+
+/* QR에 해당하는 현위치 지도 표시 */
+function updateItemLocationMap(id) {
+  const map = document.getElementById('item-location-map');
+  const image = document.getElementById('item-location-image');
+  const pulse = document.getElementById('item-location-pulse');
+
+  const location = itemLocations[id];
+
+  if (!map || !image || !pulse) return;
+
+  if (!location) {
+    map.style.display = 'none';
+    return;
+  }
+
+  image.src = location.image;
+  image.alt = '현위치 안내 지도';
+
+  pulse.style.left = location.left;
+  pulse.style.top = location.top;
+
+  map.style.display = 'block';
+}
+
 // 2~5번 획득 팝업 열기
 
 function showItemPopup(id) {
@@ -959,12 +1093,17 @@ function showItemPopup(id) {
   document.getElementById('item-popup-order').textContent =
     getAcquiredOrder(id);
 
-  // 획득 안내 문구
-  document.getElementById('item-popup-message').textContent =
-    item.korean + ' 확보가 완료되었습니다.';
+ 
+// 획득 안내 문구
+document.getElementById('item-popup-message').textContent =
+  item.korean + ' 확보가 완료되었습니다.';
 
-  // 팝업 열기
-  document.getElementById('item-popup').classList.add('show');
+// QR별 개별 지도 이미지 및 현위치 표시
+updateItemLocationMap(id);
+
+// 팝업 열기
+document.getElementById('item-popup').classList.add('show');
+
 }
 
 
