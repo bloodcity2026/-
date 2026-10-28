@@ -329,6 +329,27 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   background: #0b0d0d;
 }
 
+/* 지도 다시 보기 - 획득 물자 점멸 색상 초록색 */
+#zoom-map-container .location-pulse {
+  border-color: #4caf50;
+  animation: greenLocationPulse 1.6s ease-out infinite;
+}
+
+/* 초록색 점멸 효과 */
+@keyframes greenLocationPulse {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5);
+    box-shadow: 0 0 4px #4caf50;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.5);
+    box-shadow: 0 0 12px #4caf50;
+  }
+}
+
 </style>
 </head>
 <body>
