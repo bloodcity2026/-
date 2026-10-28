@@ -485,10 +485,10 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 #item-popup .complete-box {
   width: 100%;
   max-width: 400px;
-  height: min(94dvh, 760px);
-  max-height: 94dvh;
+ height: auto;
+max-height: 94dvh;
   padding: 15px;
-  overflow: hidden;
+ overflow-y: auto;
 
   display: flex;
   flex-direction: column;
@@ -551,16 +551,18 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   object-fit: contain;
 }
 
+
 /* 지도 전체 영역 */
 #item-popup .item-location-map {
   display: flex;
   flex-direction: column;
   width: 100%;
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   min-height: 0;
-  margin: 0;
-  gap: 6px;
+  margin: 8px 0;
+  gap: 8px;
 }
+
 
 /* 지도 위 제목 */
 .item-map-heading {
@@ -579,18 +581,18 @@ button:hover{border-color:var(--gold);color:var(--gold)}
   letter-spacing: 0;
 }
 
+
 /* 지도와 점멸 원의 좌표를 동일하게 유지 */
 #item-popup .item-location-map-image {
   position: relative;
   width: 100%;
-  max-width: 100%;
   aspect-ratio: 1076 / 599;
-  flex: 0 1 auto;
-  min-height: 0;
-  margin: auto;
+  flex: none;
+  margin: 0;
   border: 1px solid #625739;
   overflow: hidden;
 }
+
 
 #item-popup .item-location-map-image img {
   display: block;
