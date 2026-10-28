@@ -566,6 +566,25 @@ button:hover{border-color:var(--gold);color:var(--gold)}
 
 </div>
 
+<!-- 생존 물자 중복 획득 안내 -->
+<div class="complete" id="duplicate-popup">
+  <div class="complete-box">
+    <div class="tiny">ALREADY ACQUIRED</div>
+    <h2>이미 확보한 생존 물자</h2>
+
+    <p id="duplicate-item-name"></p>
+
+    <p>
+      해당 생존 물자는 이미 확보되었습니다.<br>
+      다른 생존 물자를 찾아보십시오.
+    </p>
+
+    <button onclick="closeDuplicatePopup()">
+      확인
+    </button>
+  </div>
+</div>
+
 <!-- 2~5번 생존 물자 획득 팝업 -->
 <div class="complete" id="item-popup">
   <div class="complete-box">
@@ -896,6 +915,21 @@ function getAcquiredOrder(id) {
   return orderNames[acquiredHistory.indexOf(id)] || '첫 번째';
 }
 
+/* 이미 획득한 생존 물자 안내 */
+function showDuplicatePopup(id) {
+  const item = itemInfo[id];
+  if (!item) return;
+
+  document.getElementById('duplicate-item-name').textContent =
+    'ITEM ' + item.number + ' · ' + item.korean;
+
+  document.getElementById('duplicate-popup').classList.add('show');
+}
+
+function closeDuplicatePopup() {
+  document.getElementById('duplicate-popup').classList.remove('show');
+}
+
 // 2~5번 획득 팝업 열기
 
 function showItemPopup(id) {
@@ -948,42 +982,47 @@ function closeItemPopup() {
  // QR코드 인식
 const q = new URLSearchParams(location.search).get('stamp');
 
+
 if (ids.includes(q)) {
 
-  // 새로운 물자인지 확인
-  const isNew = !saved.has(q);
-
-  if (isNew) {
-    saved.add(q);
-    acquiredHistory.push(q);
-
-    localStorage.setItem(
-      orderKey,
-      JSON.stringify(acquiredHistory)
-    );
-  }
-
-  // 스탬프 획득 상태 업데이트
-  render(false);
-
-  // 1번: 생존 경로 지도 팝업
-  if (q === 'checkpoint') {
-
-    document.getElementById('acquired-order').textContent =
-      getAcquiredOrder(q);
-
-    document.getElementById('first-map').classList.add('show');
+  // 이미 확보한 생존 물자인 경우
+  if (saved.has(q)) {
+    render(false);
+    showDuplicatePopup(q);
 
   } else {
 
-    // 2~5번: 각 물자 획득 팝업
-    showItemPopup(q);
+    // 처음 획득한 생존 물자인 경우
+    saved.add(q);
 
+    if (!acquiredHistory.includes(q)) {
+      acquiredHistory.push(q);
+
+      localStorage.setItem(
+        orderKey,
+        JSON.stringify(acquiredHistory)
+      );
+    }
+
+    render(false);
+
+    // 1번: 생존 경로 지도 팝업
+    if (q === 'checkpoint') {
+      document.getElementById('acquired-order').textContent =
+        getAcquiredOrder(q);
+
+      document.getElementById('first-map').classList.add('show');
+
+    } else {
+      // 2~5번: 각 물자 획득 팝업
+      showItemPopup(q);
+    }
   }
 
 } else {
   render();
 }
+
 
 
 </script>
