@@ -1021,6 +1021,49 @@ max-height: 94dvh;
   display: none !important;
 }
 
+/* ===== 최종 지도 파란색 점멸 효과 ===== */
+
+/* 지도 이미지 기준으로 핀 위치 고정 */
+.final-map-container {
+  position: relative;
+}
+
+/* 파란색 점멸 원 */
+.final-map-pulse {
+  position: absolute;
+
+  /* 비상대책본부 핀 위치 */
+  left: 74.9%;
+  top: 77.8%;
+
+  width: 5%;
+  aspect-ratio: 1;
+
+  border: 2px solid #299dff;
+  border-radius: 50%;
+
+  pointer-events: none;
+
+  transform: translate(-50%, -50%);
+
+  animation: finalMapPulse 1.6s ease-out infinite;
+}
+
+/* 파란색 원이 퍼졌다가 사라지는 효과 */
+@keyframes finalMapPulse {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.5);
+    box-shadow: 0 0 4px #299dff;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(2.5);
+    box-shadow: 0 0 12px #299dff;
+  }
+}
+
 </style>
  
 <!-- ===== BLOOD CITY 이미지 사전 로딩 ===== -->
@@ -1339,15 +1382,21 @@ max-height: 94dvh;
   관리자 최종 확인 대기 중
 </div>
 
+  
+<!-- 비상대책본부 위치 안내 지도 -->
+<div class="final-map-container">
 
-  <!-- 비상대책본부 위치 안내 지도 -->
-  <div class="final-map-container">
-    <img
-      src="final-map.png"
-      alt="비상대책본부 위치 안내 지도"
-      class="final-map-image"
-    >
-  </div>
+  <img
+    src="final-map.png"
+    alt="비상대책본부 위치 안내 지도"
+    class="final-map-image"
+  >
+
+  <!-- 비상대책본부 파란색 점멸 핀 -->
+  <span class="final-map-pulse"></span>
+
+</div>
+
 
   <div class="final-map-caption">
     EMERGENCY RESPONSE HEADQUARTERS
@@ -1365,9 +1414,7 @@ max-height: 94dvh;
         <strong>VERIFIED</strong>
         <small>최종 확인 완료</small>
       </div>
-      <div class="final-verified-text">
-        SURVIVAL VERIFIED
-      </div>
+      
       <p>관리자 최종 확인이 완료되었습니다.</p>
     </div>
 
