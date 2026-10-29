@@ -668,6 +668,132 @@ max-height: 94dvh;
   color: #111;
 }
 
+/* ===== 관리자 최종 생존 확인 ===== */
+
+.escape-final-box {
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+#escape-secret-title {
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 최종 확인 대기 */
+.final-pending {
+  margin-top: 22px;
+  padding: 18px 10px;
+  border: 1px solid #625739;
+  background: #171916;
+}
+
+.final-pending-title {
+  color: #b79a4e;
+  font-size: 12px;
+  letter-spacing: 2px;
+}
+
+.final-pending-text {
+  margin-top: 9px;
+  color: #a5a49b;
+  font-size: 12px;
+}
+
+/* 최종 확인 완료 */
+.final-verified {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.final-verified[hidden] {
+  display: none !important;
+}
+
+.final-stamp {
+  width: 145px;
+  height: 145px;
+  margin: 0 auto 15px;
+  border: 4px double #8ba66b;
+  border-radius: 50%;
+  color: #a8c88a;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-shadow: 0 0 20px rgba(139,166,107,.16);
+  transform: rotate(-9deg);
+}
+
+.final-stamp-check {
+  font-size: 38px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.final-stamp strong {
+  font-size: 16px;
+  letter-spacing: 2px;
+  margin-top: 6px;
+}
+
+.final-stamp small {
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.final-verified-text {
+  color: #a8c88a;
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+/* 관리자 비밀번호 입력창 */
+.admin-verify-box {
+  padding: 30px 18px;
+}
+
+#admin-verify-popup h2 {
+  font-size: 23px;
+}
+
+#admin-verify-password {
+  width: 100%;
+  margin-top: 15px;
+  padding: 13px;
+  border: 1px solid #766a45;
+  border-radius: 0;
+  background: #171916;
+  color: #e5e0d1;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+#admin-verify-password:focus {
+  border-color: #b79a4e;
+}
+
+.admin-verify-error {
+  min-height: 18px;
+  color: #d16a6a !important;
+  font-size: 11px;
+}
+
+.admin-verify-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.admin-verify-buttons button {
+  flex: 1;
+  margin-top: 5px;
+}
+
 </style>
 </head>
 <body>
@@ -898,14 +1024,74 @@ max-height: 94dvh;
 </div>
 
 
+
+<!-- 최종 탈출 승인 팝업 -->
 <div class="complete" id="complete">
-<div class="complete-box">
-<div class="tiny">ALL ITEMS ACQUIRED</div>
-<h2>ESCAPE AUTHORIZED</h2>
-<p>모든 생존 물자를 확보했습니다.<br>비상대책본부로 이동하십시오.</p>
-<button onclick="document.getElementById('complete').classList.remove('show')">확 인</button>
+  <div class="complete-box escape-final-box">
+
+    <div class="tiny">ALL ITEMS ACQUIRED</div>
+
+    <!-- 관리자: 이 제목을 연속 5번 터치 -->
+    <h2 id="escape-secret-title">ESCAPE AUTHORIZED</h2>
+
+    <p>
+      모든 생존 물자를 확보했습니다.<br>
+      비상대책본부로 이동하십시오.
+    </p>
+
+    <!-- 관리자 확인 전 -->
+    <div id="final-pending" class="final-pending">
+      <div class="final-pending-title">FINAL VERIFICATION</div>
+      <div class="final-pending-text">관리자 최종 확인 대기 중</div>
+    </div>
+
+    <!-- 관리자 확인 완료 후 -->
+    <div id="final-verified" class="final-verified" hidden>
+      <div class="final-stamp">
+        <span class="final-stamp-check">✓</span>
+        <strong>VERIFIED</strong>
+        <small>최종 확인 완료</small>
+      </div>
+      <div class="final-verified-text">
+        SURVIVAL VERIFIED
+      </div>
+      <p>관리자 최종 확인이 완료되었습니다.</p>
+    </div>
+
+    <button onclick="closeEscapePopup()">
+      확인
+    </button>
+
+  </div>
 </div>
+
+<!-- 숨겨진 관리자 비밀번호 입력창 -->
+<div class="complete" id="admin-verify-popup">
+  <div class="complete-box admin-verify-box">
+
+    <div class="tiny">ADMIN ACCESS</div>
+    <h2>FINAL VERIFICATION</h2>
+
+    <p>관리자 비밀번호를 입력하십시오.</p>
+
+    <input
+      id="admin-verify-password"
+      type="password"
+      placeholder="관리자 비밀번호"
+      autocomplete="off"
+      inputmode="numeric"
+    >
+
+    <p id="admin-verify-error" class="admin-verify-error"></p>
+
+    <div class="admin-verify-buttons">
+      <button onclick="closeAdminVerify()">취소</button>
+      <button onclick="confirmFinalVerification()">최종 확인</button>
+    </div>
+
+  </div>
 </div>
+
 
 <script>
  
@@ -1084,9 +1270,11 @@ function render(showComplete = false) {
   );
 updateEscapeReopenButton();
  
-  if (showComplete && saved.size === ids.length) {
-    document.getElementById('complete').classList.add('show');
-  }
+  updateFinalVerification();
+
+if (showComplete && saved.size === ids.length) {
+  document.getElementById('complete').classList.add('show');
+}
 }
 
 // 도장 적립
@@ -1106,6 +1294,7 @@ function stamp(id) {
 function reopenEscapePopup() {
   if (saved.size !== ids.length) return;
 
+  updateFinalVerification();
   document.getElementById('complete').classList.add('show');
 }
 
@@ -1121,7 +1310,13 @@ function updateEscapeReopenButton() {
 function resetAll() {
   saved.clear();
   acquiredHistory = [];
-
+ 
+// 관리자 최종 확인 기록 초기화
+finalVerified = false;
+localStorage.removeItem(finalVerifyKey);
+closeAdminVerify();
+updateFinalVerification();
+ 
   localStorage.removeItem('bloodcity_stamps');
   localStorage.removeItem('bloodcity_acquired_order');
 
@@ -1332,6 +1527,110 @@ function closeItemPopup() {
 }
 
 
+
+// ===== 관리자 최종 확인 시스템 =====
+
+// 관리자 비밀번호: 원하는 숫자로 변경
+// 주의: GitHub Pages에서는 실제 비밀번호 보안이 되지 않음
+const ADMIN_VERIFY_PASSWORD = '020605';
+
+// 최종 확인 저장 키
+const finalVerifyKey = 'bloodcity_final_verified';
+
+// 최종 확인 상태 불러오기
+let finalVerified =
+  localStorage.getItem(finalVerifyKey) === 'true';
+
+// 숨겨진 터치 횟수
+let secretTapCount = 0;
+let secretTapLastTime = 0;
+
+// 최종 확인 표시 업데이트
+function updateFinalVerification() {
+  const isVerified =
+    finalVerified && saved.size === ids.length;
+
+  document.getElementById('final-pending').hidden = isVerified;
+  document.getElementById('final-verified').hidden = !isVerified;
+}
+
+// 탈출 승인 팝업 닫기
+function closeEscapePopup() {
+  document.getElementById('complete').classList.remove('show');
+}
+
+// 관리자 입력창 열기
+function openAdminVerify() {
+  if (saved.size !== ids.length) return;
+  if (finalVerified) return;
+
+  document.getElementById('admin-verify-password').value = '';
+  document.getElementById('admin-verify-error').textContent = '';
+
+  document.getElementById('admin-verify-popup').classList.add('show');
+}
+
+// 관리자 입력창 닫기
+function closeAdminVerify() {
+  document.getElementById('admin-verify-popup').classList.remove('show');
+  document.getElementById('admin-verify-password').value = '';
+  document.getElementById('admin-verify-error').textContent = '';
+}
+
+// 관리자 비밀번호 확인
+function confirmFinalVerification() {
+  if (saved.size !== ids.length) return;
+
+  const password =
+    document.getElementById('admin-verify-password').value;
+
+  if (password !== ADMIN_VERIFY_PASSWORD) {
+    document.getElementById('admin-verify-error').textContent =
+      '비밀번호가 올바르지 않습니다.';
+    return;
+  }
+
+  finalVerified = true;
+  localStorage.setItem(finalVerifyKey, 'true');
+
+  updateFinalVerification();
+  closeAdminVerify();
+
+  document.getElementById('complete').classList.add('show');
+}
+
+// ESCAPE AUTHORIZED 제목을 연속 5번 터치
+document.getElementById('escape-secret-title')
+  .addEventListener('click', function() {
+
+    if (saved.size !== ids.length || finalVerified) return;
+
+    const now = Date.now();
+
+    // 터치 간격이 2초를 넘으면 횟수 초기화
+    if (now - secretTapLastTime > 2000) {
+      secretTapCount = 0;
+    }
+
+    secretTapLastTime = now;
+    secretTapCount++;
+
+    if (secretTapCount >= 5) {
+      secretTapCount = 0;
+      openAdminVerify();
+    }
+  });
+
+// 비밀번호 입력 후 엔터키로 확인
+document.getElementById('admin-verify-password')
+  .addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      confirmFinalVerification();
+    }
+  });
+
+// 저장된 최종 확인 상태 반영
+updateFinalVerification();
 
  // QR코드 인식
 const q = new URLSearchParams(location.search).get('stamp');
