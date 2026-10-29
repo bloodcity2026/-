@@ -975,12 +975,17 @@ max-height: 94dvh;
 }
 
 /* 안내 문구 */
+
 #complete .final-pending-text {
-  margin-top: 12px;
-  font-size: 13px;
+  margin-top: 18px;
+  margin-bottom: 20px;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1.8;
-  color: #c7c5bb;
+  color: #a8c88a;
+  text-align: center;
 }
+
 
 /* 비상대책본부 지도 */
 .final-map-container {
@@ -1046,7 +1051,7 @@ max-height: 94dvh;
 
   transform: translate(-50%, -50%);
 
-  animation: finalMapPulse 1.6s ease-out infinite;
+  animation: finalMapPulse 0.8s ease-out infinite;
 }
 
 /* 파란색 원이 퍼졌다가 사라지는 효과 */
@@ -1362,10 +1367,11 @@ max-height: 94dvh;
 
 
     
+
 <p id="escape-instruction">
-  모든 생존 물자를 확보했습니다.<br>
-  비상대책본부로 이동하십시오.
+  모든 생존 물자를 확보했습니다.
 </p>
+
 
 
     
@@ -1378,9 +1384,12 @@ max-height: 94dvh;
   </div>
 
   
+
 <div class="final-pending-text">
-  관리자 최종 확인 대기 중
+  비상대책본부로 이동하여<br>
+  최종 생존 확인을 받으십시오.
 </div>
+
 
   
 <!-- 비상대책본부 위치 안내 지도 -->
