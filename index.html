@@ -1051,7 +1051,7 @@ max-height: 94dvh;
 
   transform: translate(-50%, -50%);
 
-  animation: finalMapPulse 0.8s ease-out infinite;
+  animation: finalMapPulse 1.6s ease-out infinite;
 }
 
 /* 파란색 원이 퍼졌다가 사라지는 효과 */
@@ -1067,6 +1067,128 @@ max-height: 94dvh;
     transform: translate(-50%, -50%) scale(2.5);
     box-shadow: 0 0 12px #299dff;
   }
+}
+
+/* ===== BLOOD CITY 최종 확인 리디자인 ===== */
+
+#complete .complete-box {
+  max-width: 400px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 22px 18px;
+  background: #0b0d0c;
+  border: 1px solid #655b3e;
+}
+
+.final-topline {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #554d35;
+  color: #a89965;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+#complete .final-status {
+  margin-top: 22px;
+  letter-spacing: 2px;
+}
+
+#complete h2 {
+  margin: 12px 0;
+  font-size: clamp(22px, 6vw, 29px);
+  letter-spacing: 1px;
+  color: #e5e0d1;
+}
+
+#escape-instruction {
+  margin: 10px 0 20px;
+  color: #a7a69c;
+}
+
+.final-instruction {
+  padding: 16px 12px;
+  border-left: 3px solid #b79a4e;
+  background: #191a16;
+  color: #c7c5bb;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.final-instruction strong {
+  color: #c8b77f;
+  font-weight: 600;
+}
+
+.final-map-section {
+  margin-top: 18px;
+  padding: 10px;
+  border: 1px solid #625739;
+}
+
+.final-map-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: #b79a4e;
+  font-size: 9px;
+  letter-spacing: 1px;
+}
+
+.final-map-container {
+  position: relative;
+  margin-top: 10px;
+  overflow: hidden;
+}
+
+.final-map-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.final-map-caption {
+  margin-top: 10px;
+  color: #c7c5bb;
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.final-waiting {
+  margin-top: 18px;
+  color: #929087;
+  font-size: 11px;
+}
+
+#complete .final-confirm-button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 13px;
+  background: #27291f;
+  border: 1px solid #7b714e;
+  color: #e5e0d1;
+  font-weight: 600;
+}
+
+/* 파란색 점멸 위치 및 속도 */
+.final-map-pulse {
+  position: absolute;
+  left: 74.9%;
+  top: 77.8%;
+  width: 5%;
+  aspect-ratio: 1;
+  border: 2px solid #299dff;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: finalMapPulse 1.6s ease-out infinite;
+}
+
+#final-pending[hidden],
+#final-verified[hidden],
+#escape-instruction[hidden] {
+  display: none !important;
 }
 
 </style>
@@ -1356,78 +1478,75 @@ max-height: 94dvh;
 
 
 
-<!-- 최종 탈출 승인 팝업 -->
+
+<!-- 최종 생존 확인 팝업 -->
 <div class="complete" id="complete">
   <div class="complete-box escape-final-box">
 
-    <div class="tiny">ALL ITEMS ACQUIRED</div>
+    <div class="final-topline">
+      <span>BLOOD CITY / SURVIVAL RECORD</span>
+      <span>05 / 05</span>
+    </div>
 
-    <!-- 관리자: 이 제목을 연속 10번 터치 --> 
-<h2 id="escape-secret-title">ALL SUPPLIES SECURED</h2>
+    <div class="tiny final-status">
+      ALL SUPPLIES SECURED
+    </div>
 
+    <!-- 관리자 비밀 터치 기능 유지 -->
+    <h2 id="escape-secret-title">
+      FINAL VERIFICATION
+    </h2>
 
-    
+    <p id="escape-instruction">
+      모든 생존 물자를 확보했습니다.
+    </p>
 
-<p id="escape-instruction">
-  모든 생존 물자를 확보했습니다.
-</p>
+    <!-- 관리자 확인 전 -->
+    <div id="final-pending">
 
+      <div class="final-instruction">
+        최종 생존 확인을 위해<br>
+        <strong>비상대책본부로 이동하십시오.</strong>
+      </div>
 
+      <div class="final-map-section">
+        <div class="final-map-heading">
+          <span>⌖ HEADQUARTERS LOCATION</span>
+          <span>05 / 05</span>
+        </div>
 
-    
+        <div class="final-map-container">
+          <img
+            src="final-map.png"
+            alt="비상대책본부 위치 안내 지도"
+            class="final-map-image"
+          >
+          <span class="final-map-pulse"></span>
+        </div>
 
-<!-- 관리자 최종 확인 전 -->
-<div id="final-pending" class="final-pending">
+        <div class="final-map-caption">
+          비상대책본부 위치 안내
+        </div>
+      </div>
 
-  <div class="final-pending-title">
-    FINAL VERIFICATION
-  </div>
+      <div class="final-waiting">
+        관리자 최종 확인 대기 중
+      </div>
 
-  
+    </div>
 
-<div class="final-pending-text">
-  비상대책본부로 이동하여<br>
-  최종 생존 확인을 받으십시오.
-</div>
-
-
-  
-<!-- 비상대책본부 위치 안내 지도 -->
-<div class="final-map-container">
-
-  <img
-    src="final-map.png"
-    alt="비상대책본부 위치 안내 지도"
-    class="final-map-image"
-  >
-
-  <!-- 비상대책본부 파란색 점멸 핀 -->
-  <span class="final-map-pulse"></span>
-
-</div>
-
-
-  <div class="final-map-caption">
-    EMERGENCY RESPONSE HEADQUARTERS
-    <span>비상대책본부 위치 안내</span>
-  </div>
-
-</div>
-
-
-
-    <!-- 관리자 확인 완료 후 -->
+    <!-- 관리자 확인 후 -->
     <div id="final-verified" class="final-verified" hidden>
       <div class="final-stamp">
         <span class="final-stamp-check">✓</span>
         <strong>VERIFIED</strong>
         <small>최종 확인 완료</small>
       </div>
-      
       <p>관리자 최종 확인이 완료되었습니다.</p>
     </div>
 
-    <button onclick="closeEscapePopup()">
+    <button class="final-confirm-button"
+            onclick="closeEscapePopup()">
       확인
     </button>
 
@@ -1992,8 +2111,8 @@ function updateFinalVerification() {
 document.getElementById('escape-secret-title').textContent =
   isVerified
     ? 'SURVIVAL VERIFIED'
-    : 'ALL SUPPLIES SECURED';
-
+    : 'FINAL VERIFICATION';
+ 
 document.getElementById('escape-instruction').hidden = isVerified;
 
   // 탈출 승인 팝업의 확인 상태
