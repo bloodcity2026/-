@@ -898,6 +898,60 @@ max-height: 94dvh;
   overflow-y: auto;
 }
 
+/* 관리자 테스트 패널 */
+#admin-reset-popup .complete-box {
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+#admin-test-panel[hidden],
+#admin-reset-login[hidden] {
+  display: none !important;
+}
+
+.admin-test-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.admin-test-grid button,
+.admin-test-action,
+.admin-test-danger,
+.admin-test-close {
+  width: 100%;
+  padding: 12px 8px;
+  font-size: 12px;
+}
+
+.admin-test-grid button {
+  border: 1px solid #766a45;
+  background: #1d211a;
+  color: #d1cec0;
+}
+
+.admin-test-action {
+  display: block;
+  margin-top: 9px !important;
+  border-color: #766a45;
+  background: #25291f;
+  color: #c8b77f;
+}
+
+.admin-test-danger {
+  display: block;
+  margin-top: 18px !important;
+  border-color: #8c4444;
+  background: #291717;
+  color: #e49a9a;
+}
+
+.admin-test-close {
+  display: block;
+  margin-top: 9px !important;
+}
+
 </style>
  
 <!-- ===== BLOOD CITY 이미지 사전 로딩 ===== -->
@@ -1223,35 +1277,72 @@ max-height: 94dvh;
   </div>
 </div>
 
-<!-- 숨겨진 관리자 초기화 팝업 -->
+
+<!-- 관리자 테스트 및 초기화 팝업 -->
 <div class="complete" id="admin-reset-popup">
   <div class="complete-box admin-verify-box">
 
     <div class="tiny">ADMIN ACCESS</div>
-    <h2 style="font-size:24px;">RESET SURVIVAL RECORD</h2>
+    <h2 style="font-size:23px;">TEST CONTROL</h2>
 
-    <p>
-      생존 물자 획득 기록을 초기화하시겠습니까?<br>
-      초기화 후에는 모든 기록이 삭제됩니다.
-    </p>
+    <!-- 비밀번호 입력 -->
+    <div id="admin-reset-login">
+      <p>관리자 비밀번호를 입력하십시오.</p>
 
-    <input
-      id="admin-reset-password"
-      type="password"
-      placeholder="관리자 비밀번호"
-      autocomplete="off"
-      inputmode="numeric"
-    >
+      <input
+        id="admin-reset-password"
+        type="password"
+        placeholder="관리자 비밀번호"
+        autocomplete="off"
+        inputmode="numeric"
+      >
 
-    <p id="admin-reset-error" class="admin-verify-error"></p>
+      <p id="admin-reset-error" class="admin-verify-error"></p>
 
-    <div class="admin-verify-buttons">
-      <button onclick="closeAdminReset()">취소</button>
-      <button onclick="confirmAdminReset()">초기화</button>
+      <div class="admin-verify-buttons">
+        <button onclick="closeAdminReset()">취소</button>
+        <button onclick="confirmAdminReset()">접속</button>
+      </div>
+    </div>
+
+    <!-- 관리자 인증 후 표시 -->
+    <div id="admin-test-panel" hidden>
+
+      <p>생존 물자 테스트 및 기록 관리</p>
+
+      <div class="admin-test-grid">
+        <button onclick="adminTestAcquire('checkpoint')">1번 지도</button>
+        <button onclick="adminTestAcquire('radio')">2번 식수</button>
+        <button onclick="adminTestAcquire('store')">3번 손전등</button>
+        <button onclick="adminTestAcquire('supply')">4번 식량</button>
+        <button onclick="adminTestAcquire('exit')">5번 점화 도구</button>
+      </div>
+
+      <button class="admin-test-action" onclick="adminTestFour()">
+        물자 4개 획득 상태
+      </button>
+
+      <button class="admin-test-action" onclick="adminTestAll()">
+        물자 5개 획득 상태
+      </button>
+
+      <button class="admin-test-action" onclick="adminTestVerified()">
+        최종 확인 완료 도장 테스트
+      </button>
+
+      <button class="admin-test-danger" onclick="adminTestReset()">
+        전체 기록 초기화
+      </button>
+
+      <button class="admin-test-close" onclick="closeAdminReset()">
+        닫기
+      </button>
+
     </div>
 
   </div>
 </div>
+
 
 <!-- 숨겨진 관리자 비밀번호 입력창 -->
 <div class="complete" id="admin-verify-popup">
@@ -1842,11 +1933,15 @@ let resetTapCount = 0;
 let resetTapLastTime = 0;
 
 // 관리자 초기화 창 열기
+
 function openAdminReset() {
   document.getElementById('admin-reset-password').value = '';
   document.getElementById('admin-reset-error').textContent = '';
+  document.getElementById('admin-reset-login').hidden = false;
+  document.getElementById('admin-test-panel').hidden = true;
   document.getElementById('admin-reset-popup').classList.add('show');
 }
+
 
 // 관리자 초기화 창 닫기
 function closeAdminReset() {
@@ -1856,6 +1951,7 @@ function closeAdminReset() {
 }
 
 // 비밀번호 확인 후 초기화
+
 function confirmAdminReset() {
   const password =
     document.getElementById('admin-reset-password').value;
@@ -1865,6 +1961,11 @@ function confirmAdminReset() {
       '비밀번호가 올바르지 않습니다.';
     return;
   }
+
+  document.getElementById('admin-reset-login').hidden = true;
+  document.getElementById('admin-test-panel').hidden = false;
+}
+
 
   closeAdminReset();
   resetAll();
@@ -1896,6 +1997,91 @@ document.getElementById('admin-reset-password')
       confirmAdminReset();
     }
   });
+
+// ===== 관리자 테스트 기능 =====
+
+// 테스트용 획득 기록 저장
+function adminSaveTestState() {
+  localStorage.setItem(
+    orderKey,
+    JSON.stringify(acquiredHistory)
+  );
+  render(false);
+}
+
+// 테스트용 물자 개별 획득
+function adminTestAcquire(id) {
+  if (!ids.includes(id)) return;
+
+  if (saved.has(id)) {
+    alert('이미 확보한 생존 물자입니다.');
+    return;
+  }
+
+  saved.add(id);
+  acquiredHistory.push(id);
+
+  adminSaveTestState();
+  closeAdminReset();
+
+  if (id === 'checkpoint') {
+    document.getElementById('acquired-order').textContent =
+      getAcquiredOrder(id);
+    document.getElementById('first-map').classList.add('show');
+  } else {
+    showItemPopup(id);
+  }
+}
+
+// 4개 획득 상태로 설정
+function adminTestFour() {
+  saved = new Set(ids.slice(0, 4));
+  acquiredHistory = ids.slice(0, 4);
+
+  finalVerified = false;
+  localStorage.removeItem(finalVerifyKey);
+
+  adminSaveTestState();
+  closeAdminReset();
+}
+
+// 5개 획득 상태로 설정
+function adminTestAll() {
+  saved = new Set(ids);
+  acquiredHistory = [...ids];
+
+  finalVerified = false;
+  localStorage.removeItem(finalVerifyKey);
+
+  adminSaveTestState();
+  closeAdminReset();
+
+  reopenEscapePopup();
+}
+
+// 최종 확인 도장 테스트
+function adminTestVerified() {
+  saved = new Set(ids);
+  acquiredHistory = [...ids];
+
+  finalVerified = true;
+  localStorage.setItem(finalVerifyKey, 'true');
+
+  adminSaveTestState();
+  closeAdminReset();
+
+  reopenEscapePopup();
+}
+
+// 모든 기록 초기화
+function adminTestReset() {
+  if (!confirm('모든 생존 물자 기록과 최종 확인 도장을 초기화하시겠습니까?')) {
+    return;
+  }
+
+  closeAdminReset();
+  resetAll();
+}
 
  // QR코드 인식
 const q = new URLSearchParams(location.search).get('stamp');
