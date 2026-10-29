@@ -870,6 +870,34 @@ max-height: 94dvh;
   }
 }
 
+/* 관리자 초기화 비밀번호 입력창 */
+#admin-reset-password {
+  width: 100%;
+  margin-top: 15px;
+  padding: 13px;
+  border: 1px solid #766a45;
+  border-radius: 0;
+  background: #171916;
+  color: #e5e0d1;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+}
+
+#admin-reset-password:focus {
+  border-color: #b79a4e;
+}
+
+#admin-reset-popup h2 {
+  font-size: 23px;
+  overflow-wrap: anywhere;
+}
+
+#admin-reset-popup .complete-box {
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
 </style>
  
 <!-- ===== BLOOD CITY 이미지 사전 로딩 ===== -->
@@ -982,10 +1010,7 @@ max-height: 94dvh;
     탈출 승인 다시 보기
   </button>
 
-  <!-- 테스트용 초기화 -->
-  <button class="reset-test-btn" onclick="resetAll()">
-    생존 물자 초기화 (테스트용)
-  </button>
+ 
 
 </div>
 
@@ -1194,6 +1219,36 @@ max-height: 94dvh;
     <button onclick="closeEscapePopup()">
       확인
     </button>
+
+  </div>
+</div>
+
+<!-- 숨겨진 관리자 초기화 팝업 -->
+<div class="complete" id="admin-reset-popup">
+  <div class="complete-box admin-verify-box">
+
+    <div class="tiny">ADMIN ACCESS</div>
+    <h2 style="font-size:24px;">RESET SURVIVAL RECORD</h2>
+
+    <p>
+      생존 물자 획득 기록을 초기화하시겠습니까?<br>
+      초기화 후에는 모든 기록이 삭제됩니다.
+    </p>
+
+    <input
+      id="admin-reset-password"
+      type="password"
+      placeholder="관리자 비밀번호"
+      autocomplete="off"
+      inputmode="numeric"
+    >
+
+    <p id="admin-reset-error" class="admin-verify-error"></p>
+
+    <div class="admin-verify-buttons">
+      <button onclick="closeAdminReset()">취소</button>
+      <button onclick="confirmAdminReset()">초기화</button>
+    </div>
 
   </div>
 </div>
@@ -1743,7 +1798,7 @@ function confirmFinalVerification() {
   document.getElementById('complete').classList.add('show');
 }
 
-// ESCAPE AUTHORIZED 제목을 연속 5번 터치
+// ESCAPE AUTHORIZED 제목을 연속 10번 터치
 document.getElementById('escape-secret-title')
   .addEventListener('click', function() {
 
@@ -1759,7 +1814,7 @@ document.getElementById('escape-secret-title')
     secretTapLastTime = now;
     secretTapCount++;
 
-    if (secretTapCount >= 5) {
+    if (secretTapCount >= 10) {
       secretTapCount = 0;
       openAdminVerify();
     }
@@ -1775,6 +1830,72 @@ document.getElementById('admin-verify-password')
 
 // 저장된 최종 확인 상태 반영
 updateFinalVerification();
+
+// ===== 숨겨진 관리자 초기화 시스템 =====
+
+
+// 관리자 초기화 전용 비밀번호
+const ADMIN_RESET_PASSWORD = '3141592';
+
+
+let resetTapCount = 0;
+let resetTapLastTime = 0;
+
+// 관리자 초기화 창 열기
+function openAdminReset() {
+  document.getElementById('admin-reset-password').value = '';
+  document.getElementById('admin-reset-error').textContent = '';
+  document.getElementById('admin-reset-popup').classList.add('show');
+}
+
+// 관리자 초기화 창 닫기
+function closeAdminReset() {
+  document.getElementById('admin-reset-popup').classList.remove('show');
+  document.getElementById('admin-reset-password').value = '';
+  document.getElementById('admin-reset-error').textContent = '';
+}
+
+// 비밀번호 확인 후 초기화
+function confirmAdminReset() {
+  const password =
+    document.getElementById('admin-reset-password').value;
+
+  if (password !== ADMIN_RESET_PASSWORD) {
+    document.getElementById('admin-reset-error').textContent =
+      '비밀번호가 올바르지 않습니다.';
+    return;
+  }
+
+  closeAdminReset();
+  resetAll();
+}
+
+// SURVIVAL RECORD를 연속 5번 터치
+const resetTrigger = document.querySelector('.status strong');
+
+resetTrigger.addEventListener('click', function() {
+  const now = Date.now();
+
+  if (now - resetTapLastTime > 2000) {
+    resetTapCount = 0;
+  }
+
+  resetTapLastTime = now;
+  resetTapCount++;
+
+  if (resetTapCount >= 10) {
+    resetTapCount = 0;
+    openAdminReset();
+  }
+});
+
+// 엔터키로 비밀번호 확인
+document.getElementById('admin-reset-password')
+  .addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+      confirmAdminReset();
+    }
+  });
 
  // QR코드 인식
 const q = new URLSearchParams(location.search).get('stamp');
