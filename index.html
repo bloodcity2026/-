@@ -1637,8 +1637,14 @@ function showItemPopup(id) {
 
  
 // 획득 안내 문구
+
+const isLastItem = saved.size === ids.length;
+
 document.getElementById('item-popup-message').textContent =
-  item.korean + ' 확보가 완료되었습니다.';
+  isLastItem
+    ? '마지막 생존 물자를 획득하였습니다.'
+    : '생존 물자를 획득하였습니다.';
+
 
 // QR별 개별 지도 이미지 및 현위치 표시
 updateItemLocationMap(id);
