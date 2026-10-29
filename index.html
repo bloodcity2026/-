@@ -646,6 +646,28 @@ max-height: 94dvh;
   }
 }
 
+/* 탈출 승인 다시 보기 버튼 */
+.escape-reopen-btn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto 12px;
+  padding: 12px 16px;
+
+  border: 1px solid #b79a4e;
+  background: #25291f;
+  color: #c8b77f;
+
+  font-size: 12px;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.escape-reopen-btn:hover {
+  background: #b79a4e;
+  color: #111;
+}
+
 </style>
 </head>
 <body>
@@ -688,12 +710,27 @@ max-height: 94dvh;
 <div class="small">SUPPLY COLLECTION PROGRESS</div>
 
  
-<!-- 테스트용 생존 물자 초기화 버튼 -->
+
+<!-- 탈출 승인 다시 보기 및 초기화 버튼 -->
 <div class="reset-area">
+
+  <!-- QR 5개 획득 시에만 표시 -->
+  <button
+    id="escape-reopen-btn"
+    class="escape-reopen-btn"
+    onclick="reopenEscapePopup()"
+    style="display:none;"
+  >
+    탈출 승인 다시 보기
+  </button>
+
+  <!-- 테스트용 초기화 -->
   <button class="reset-test-btn" onclick="resetAll()">
     생존 물자 초기화 (테스트용)
   </button>
+
 </div>
+
 
  
 <!-- 첫 번째 생존 물자 획득 팝업 -->
@@ -1045,7 +1082,8 @@ function render(showComplete = false) {
     'bloodcity_stamps',
     JSON.stringify([...saved])
   );
-
+updateEscapeReopenButton();
+ 
   if (showComplete && saved.size === ids.length) {
     document.getElementById('complete').classList.add('show');
   }
@@ -1063,6 +1101,22 @@ function stamp(id) {
   );
 }
 
+
+// 탈출 승인 다시 보기
+function reopenEscapePopup() {
+  if (saved.size !== ids.length) return;
+
+  document.getElementById('complete').classList.add('show');
+}
+
+// 탈출 승인 다시 보기 버튼 표시 여부
+function updateEscapeReopenButton() {
+  const button = document.getElementById('escape-reopen-btn');
+  if (!button) return;
+
+  button.style.display =
+    saved.size === ids.length ? 'block' : 'none';
+}
 
 function resetAll() {
   saved.clear();
