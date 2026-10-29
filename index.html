@@ -952,6 +952,10 @@ max-height: 94dvh;
   margin-top: 9px !important;
 }
 
+#escape-instruction[hidden] {
+  display: none !important;
+}
+
 </style>
  
 <!-- ===== BLOOD CITY 이미지 사전 로딩 ===== -->
@@ -1243,10 +1247,12 @@ max-height: 94dvh;
     <!-- 관리자: 이 제목을 연속 5번 터치 -->
     <h2 id="escape-secret-title">ESCAPE AUTHORIZED</h2>
 
-    <p>
-      모든 생존 물자를 확보했습니다.<br>
-      비상대책본부로 이동하십시오.
-    </p>
+    
+<p id="escape-instruction">
+  모든 생존 물자를 확보했습니다.<br>
+  비상대책본부로 이동하십시오.
+</p>
+
 
     <!-- 관리자 확인 전 -->
     <div id="final-pending" class="final-pending">
@@ -1827,6 +1833,8 @@ let secretTapLastTime = 0;
 function updateFinalVerification() {
   const isVerified =
     finalVerified && saved.size === ids.length;
+
+document.getElementById('escape-instruction').hidden = isVerified;
 
   // 탈출 승인 팝업의 확인 상태
   document.getElementById('final-pending').hidden = isVerified;
