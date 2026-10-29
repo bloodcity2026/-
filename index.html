@@ -1140,11 +1140,12 @@ max-height: 94dvh;
 
     </div>
 
-    <!-- 획득 안내 -->
-    <p class="item-acquired-message">
-      <span id="item-popup-order">첫 번째</span>
-      생존 물자를 확보했습니다.
-    </p>
+    
+<!-- 획득 안내 -->
+<p class="item-acquired-message" id="item-popup-message">
+  생존 물자를 확보했습니다.
+</p>
+
 
     <p id="item-popup-message" hidden></p>
 
@@ -1631,19 +1632,14 @@ function showItemPopup(id) {
   itemImage.src = item.image;
   itemImage.alt = item.korean;
 
-  // 실제 획득 순서
-  document.getElementById('item-popup-order').textContent =
-    getAcquiredOrder(id);
-
- 
-// 획득 안내 문구
-
+  
+// 실제 획득 순서에 따른 안내 문구
 const isLastItem = saved.size === ids.length;
 
 document.getElementById('item-popup-message').textContent =
   isLastItem
-    ? '마지막 생존 물자를 획득하였습니다.'
-    : '생존 물자를 획득하였습니다.';
+    ? '마지막 생존 물자를 확보했습니다.'
+    : getAcquiredOrder(id) + ' 생존 물자를 확보했습니다.';
 
 
 // QR별 개별 지도 이미지 및 현위치 표시
