@@ -1244,8 +1244,9 @@ max-height: 94dvh;
 
     <div class="tiny">ALL ITEMS ACQUIRED</div>
 
-    <!-- 관리자: 이 제목을 연속 5번 터치 -->
-    <h2 id="escape-secret-title">ESCAPE AUTHORIZED</h2>
+    <!-- 관리자: 이 제목을 연속 5번 터치 --> 
+<h2 id="escape-secret-title">ALL SUPPLIES SECURED</h2>
+
 
     
 <p id="escape-instruction">
@@ -1833,6 +1834,12 @@ let secretTapLastTime = 0;
 function updateFinalVerification() {
   const isVerified =
     finalVerified && saved.size === ids.length;
+
+// 관리자 최종 확인 여부에 따라 제목 변경
+document.getElementById('escape-secret-title').textContent =
+  isVerified
+    ? 'SURVIVAL VERIFIED'
+    : 'ALL SUPPLIES SECURED';
 
 document.getElementById('escape-instruction').hidden = isVerified;
 
