@@ -801,6 +801,75 @@ max-height: 94dvh;
   line-height: 1.4;
 }
 
+/* 첫 화면 안내 문구 + 최종 확인 도장 */
+.intro-verification-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.intro-description {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 첫 화면 최종 확인 도장 */
+.intro-verified-stamp {
+  width: 94px;
+  height: 94px;
+  flex-shrink: 0;
+
+  border: 3px double #8ba66b;
+  border-radius: 50%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  color: #a8c88a;
+  transform: rotate(-10deg);
+  box-shadow: 0 0 12px rgba(139,166,107,0.15);
+}
+
+.intro-verified-stamp[hidden] {
+  display: none !important;
+}
+
+.intro-stamp-check {
+  font-size: 27px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.intro-verified-stamp strong {
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.intro-verified-stamp small {
+  font-size: 9px;
+  margin-top: 3px;
+}
+
+/* 작은 휴대폰 화면 대응 */
+@media (max-width: 380px) {
+  .intro-verified-stamp {
+    width: 78px;
+    height: 78px;
+  }
+
+  .intro-verified-stamp strong {
+    font-size: 9px;
+  }
+
+  .intro-verified-stamp small {
+    font-size: 8px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -811,7 +880,23 @@ max-height: 94dvh;
 <div class="sub">: 버려진 도시 · 2026</div>
 </section>
 
-<div class="notice">현재 당신이 있는 도시는 폐쇄되었습니다.<br>숨겨진 생존 물자들을 확보하고 생존하십시오.</div>
+
+<div class="intro-verification-row">
+
+  <div class="notice intro-description">
+    현재 당신이 있는 도시는 폐쇄되었습니다.<br>
+    숨겨진 생존 물자들을 확보하고 생존하십시오.
+  </div>
+
+  <!-- 관리자 최종 확인 완료 도장 -->
+  <div id="intro-verified-stamp" class="intro-verified-stamp" hidden>
+    <span class="intro-stamp-check">✓</span>
+    <strong>VERIFIED</strong>
+    <small>최종 확인 완료</small>
+  </div>
+
+</div>
+
 
 <div class="status"><strong>SURVIVAL RECORD</strong><span class="count"><span id="count">0</span> / 5</span></div>
 
@@ -1553,13 +1638,23 @@ let secretTapCount = 0;
 let secretTapLastTime = 0;
 
 // 최종 확인 표시 업데이트
+
 function updateFinalVerification() {
   const isVerified =
     finalVerified && saved.size === ids.length;
 
+  // 탈출 승인 팝업의 확인 상태
   document.getElementById('final-pending').hidden = isVerified;
   document.getElementById('final-verified').hidden = !isVerified;
+
+  // 첫 화면 오른쪽의 확인 도장
+  const introStamp = document.getElementById('intro-verified-stamp');
+
+  if (introStamp) {
+    introStamp.hidden = !isVerified;
+  }
 }
+
 
 // 탈출 승인 팝업 닫기
 function closeEscapePopup() {
