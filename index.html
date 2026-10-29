@@ -1225,9 +1225,6 @@ max-height: 94dvh;
   생존 물자를 확보했습니다.
 </p>
 
-
-    <p id="item-popup-message" hidden></p>
-
     <button class="item-confirm-btn" onclick="closeItemPopup()">
       물자 확인 완료
     </button>
@@ -1964,14 +1961,10 @@ function confirmAdminReset() {
 
   document.getElementById('admin-reset-login').hidden = true;
   document.getElementById('admin-test-panel').hidden = false;
+
 }
 
-
-  closeAdminReset();
-  resetAll();
-}
-
-// SURVIVAL RECORD를 연속 5번 터치
+// SURVIVAL RECORD를 연속 10번 터치
 const resetTrigger = document.querySelector('.status strong');
 
 resetTrigger.addEventListener('click', function() {
