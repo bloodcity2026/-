@@ -1984,10 +1984,14 @@ saved.forEach(id => {
   }
 });
 
-localStorage.setItem(
-  orderKey,
-  JSON.stringify(acquiredHistory)
-);
+try {
+  localStorage.setItem(
+    orderKey,
+    JSON.stringify(acquiredHistory)
+  );
+} catch (error) {
+  console.warn('획득 순서 기록 저장 실패:', error);
+}
 
 // 획득 순서 한글 변환
 const orderNames = [
