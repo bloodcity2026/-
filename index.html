@@ -1958,9 +1958,22 @@ const itemInfo = {
 // 획득 순서 기록
 const orderKey = 'bloodcity_acquired_order';
 
-let acquiredHistory = JSON.parse(
-  localStorage.getItem(orderKey) || '[]'
-);
+let acquiredHistory;
+
+try {
+  const raw = localStorage.getItem(orderKey);
+  const parsed = JSON.parse(raw || '[]');
+
+  acquiredHistory = Array.isArray(parsed)
+    ? [...new Set(parsed.filter(id =>
+        typeof id === 'string' && ids.includes(id)
+      ))]
+    : [];
+
+} catch (error) {
+  console.warn('획득 순서 기록 불러오기 실패:', error);
+  acquiredHistory = [];
+}
 
 // 기존 적립 기록과 순서 기록 동기화
 acquiredHistory = acquiredHistory.filter(id => saved.has(id));
