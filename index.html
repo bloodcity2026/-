@@ -1802,11 +1802,39 @@ const ids = [
   'exit'
 ];
 
-let saved = new Set(
-  JSON.parse(
-    localStorage.getItem('bloodcity_stamps') || '[]'
-  )
-);
+// ===== 생존 물자 저장 데이터 안전하게 불러오기 =====
+
+function loadSavedStamps() {
+  try {
+    const raw = localStorage.getItem('bloodcity_stamps');
+
+    if (!raw) {
+      return new Set();
+    }
+
+    const parsed = JSON.parse(raw);
+
+    // 저장된 데이터가 배열인지 확인
+    if (!Array.isArray(parsed)) {
+      throw new Error('잘못된 저장 데이터 형식');
+    }
+
+    // 실제 존재하는 생존 물자 ID만 인정
+    const validStamps = parsed.filter(id =>
+      typeof id === 'string' && ids.includes(id)
+    );
+
+    return new Set(validStamps);
+
+  } catch (error) {
+    console.warn('생존 물자 기록 불러오기 실패:', error);
+
+    // 오류 발생 시 사이트가 멈추지 않도록 빈 기록 사용
+    return new Set();
+  }
+}
+
+let saved = loadSavedStamps();
 
 // 스탬프 화면 업데이트
 function render(showComplete = false) {
@@ -1819,10 +1847,15 @@ function render(showComplete = false) {
   document.getElementById('fill').style.width =
     (saved.size / ids.length * 100) + '%';
 
+try {
   localStorage.setItem(
     'bloodcity_stamps',
     JSON.stringify([...saved])
   );
+} catch (error) {
+  console.warn('생존 물자 기록 저장 실패:', error);
+}
+ 
 updateEscapeReopenButton();
  
   updateFinalVerification();
